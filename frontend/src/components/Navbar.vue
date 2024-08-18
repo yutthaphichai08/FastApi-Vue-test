@@ -10,17 +10,26 @@
       >
         New
       </button>
+      <div class="container-button">
+        <ExportButton />
+        <ImportButton />
+      </div>
     </div>
+
     <ModalCreate ref="modal" />
   </nav>
 </template>
 
 <script>
 import ModalCreate from "./ModalCreate.vue";
+import ExportButton from "./ExportButton.vue";
+import ImportButton from "./ImportButton.vue";
 
 export default {
   components: {
     ModalCreate,
+    ExportButton,
+    ImportButton,
   },
   methods: {
     openModal() {
@@ -31,4 +40,9 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+.container-button {
+  display: flex;
+  gap: 6px;
+}
+</style>
