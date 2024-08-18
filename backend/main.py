@@ -76,7 +76,7 @@ def de_activate_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
-@app.get("/export")
+@app.get("/users/export")
 async def export_users(db: Session = Depends(get_db)):
     users = crud.get_users(db)
     buffer = io.StringIO()
@@ -92,7 +92,7 @@ async def export_users(db: Session = Depends(get_db)):
         "Content-Disposition": "attachment; filename=users.csv"
     })
 
-@app.post("/import")
+@app.post("/users/import")
 async def update_users_from_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
 
     if file.content_type != 'text/csv':

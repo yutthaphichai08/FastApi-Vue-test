@@ -1,0 +1,6 @@
+id,firstname,lastname,address,salary,is_active
+1,Jonathan,Kao,123 Main St,50000,TRUE
+2,John,Oche,124 Main St,39000,TRUE
+3,Beem,Funny,125 Main St,15000,TRUE
+4,Leo,Messi,126 Main St,40000,TRUE
+5,Jordan,Jr,127 Main St,16000,TRUE
