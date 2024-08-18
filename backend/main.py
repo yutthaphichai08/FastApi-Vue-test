@@ -1,4 +1,7 @@
-from fastapi import Depends, FastAPI, HTTPException
+import csv
+import io
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 import crud, models, schemas
@@ -73,8 +76,37 @@ def de_activate_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+@app.get("/export")
+async def export_users(db: Session = Depends(get_db)):
+    users = crud.get_users(db)
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(["id", "firstname", "lastname","address","salary","is_active"])
+    
+    for user in users:
+        writer.writerow([user.id, user.firstname, user.lastname,user.address,user.salary,user.is_active])
+    
+    buffer.seek(0)
 
+    return StreamingResponse(buffer, media_type="text/csv", headers={
+        "Content-Disposition": "attachment; filename=users.csv"
+    })
 
+@app.post("/import")
+async def update_users_from_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
+
+    if file.content_type != 'text/csv':
+        raise HTTPException(status_code=400, detail="Invalid file format. Please upload a CSV file.")
+
+    contents = await file.read()
+    csv_reader = csv.reader(io.StringIO(contents.decode("utf-8")))
+
+    # remove header
+    header = next(csv_reader)
+
+    updated_users = crud.import_user(db, csv_reader)
+
+    return {"detail": "updated successfully", "updated_data": updated_users}
 
 
 

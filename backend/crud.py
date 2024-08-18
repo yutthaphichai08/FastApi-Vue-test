@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy.orm import Session
 
 import models, schemas
@@ -16,7 +17,8 @@ def create_user(db: Session, user: schemas.UserCreate):
         firstname=user.firstname,
         lastname=user.lastname,
         address=user.address,
-        salary=user.salary
+        salary=user.salary,
+        is_active=user.is_active
     )
     db.add(db_user)
     db.commit()
@@ -53,6 +55,20 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def import_user(db: Session, users: List[schemas.UserCreate]): 
+     db.query(models.User).delete()
+     db.commit()
+
+     for user in users:
+         db_user = models.User(firstname=user[1], lastname=user[2],address=user[3],salary=user[4])
+         db.add(db_user)
+         db.commit()
+         db.refresh(db_user)
+
+     all_user = db.query(models.User).all()
+
+     return all_user
 
 # def get_user_by_email(db: Session, email: str):
 #     return db.query(models.User).filter(models.User.email == email).first()
