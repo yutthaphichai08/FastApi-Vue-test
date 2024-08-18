@@ -1,5 +1,6 @@
 import csv
 import io
+from typing import List
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
@@ -35,65 +36,67 @@ app.add_middleware(
 )
 
 
-@app.post("/users", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+@app.post("/application", response_model=schemas.Application)
+def create_user(appli: schemas.ApplicationCreate, db: Session = Depends(get_db)):
     # ตรวจสอบว่ามีการส่ง firstname และ lastname มาหรือไม่
-    if not user.firstname or not user.lastname:
+    if not appli.firstname or not appli.lastname:
         raise HTTPException(status_code=400, detail="Firstname and Lastname are required")
 
-    return crud.create_user(db=db, user=user)
+    return crud.create_appli(db=db, appli=appli)
 
 
-@app.get("/users", response_model=list[schemas.User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = crud.get_users(db, skip=skip, limit=limit)
-    return users
+@app.get("/application", response_model=list[schemas.Application])
+def read_applis(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    applis = crud.get_applis(db, skip=skip, limit=limit)
+    return applis
 
 
-@app.get("/user/{user_id}", response_model=schemas.User)
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db=db, user_id=user_id)
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+@app.get("/application/{appli_id}", response_model=schemas.Application)
+def get_appli(appli_id: int, db: Session = Depends(get_db)):
+    db_appli= crud.get_appli(db=db, appli_id=appli_id)
+    if not db_appli:
+        raise HTTPException(status_code=404, detail="Application not found")
+    return db_appli
 
 
-@app.put("/user/update/{user_id}", response_model=schemas.User)
-def update_user(user_id: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):
-    if not user_update.firstname or not user_update.lastname:
+@app.put("/application/update/{appli_id}", response_model=schemas.Application)
+def appli_update(appli_id: int, appli_update: schemas.ApplicationUpdate, db: Session = Depends(get_db)):
+    if not appli_update.firstname or not appli_update.lastname:
         raise HTTPException(status_code=400, detail="Firstname and Lastname are required")
 
-    db_user = crud.update_user(db=db, user_id=user_id, user_update=user_update)
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+    db_appli = crud.update_appli(db=db, appli_id=appli_id, appli_update=appli_update)
+    if not db_appli:
+        raise HTTPException(status_code=404, detail="Application not found")
+    return db_appli
 
 
-@app.patch("/user/delete/{user_id}", response_model=schemas.User)
-def de_activate_user(user_id: int, db: Session = Depends(get_db)):
-    db_user = crud.delete_user(db=db, user_id=user_id)
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
+@app.delete("/application/{appli_id}", response_model=schemas.Application)
+def de_activate_user(appli_id: int, db: Session = Depends(get_db)):
+    db_appli = crud.delete_appli(db=db, appli_id=appli_id)
+    if not db_appli:
+        raise HTTPException(status_code=404, detail="Application not found")
+    return db_appli
 
-@app.get("/users/export")
+    
+@app.get("/export")
 async def export_users(db: Session = Depends(get_db)):
-    users = crud.get_users(db)
+    applis = crud.get_applis(db)
     buffer = io.StringIO()
     writer = csv.writer(buffer)
     writer.writerow(["id", "firstname", "lastname","address","salary","is_active"])
     
-    for user in users:
-        writer.writerow([user.id, user.firstname, user.lastname,user.address,user.salary,user.is_active])
+    for appli in applis:
+        writer.writerow([appli.id, appli.firstname, appli.lastname,appli.address,appli.salary,appli.is_active])
     
     buffer.seek(0)
 
     return StreamingResponse(buffer, media_type="text/csv", headers={
         "Content-Disposition": "attachment; filename=users.csv"
     })
+    
 
-@app.post("/users/import")
-async def update_users_from_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
+@app.post("/import")
+async def update_applis_from_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
 
     if file.content_type != 'text/csv':
         raise HTTPException(status_code=400, detail="Invalid file format. Please upload a CSV file.")
@@ -104,9 +107,30 @@ async def update_users_from_csv(file: UploadFile = File(...), db: Session = Depe
     # remove header
     header = next(csv_reader)
 
-    updated_users = crud.import_user(db, csv_reader)
+    updated_applis = crud.import_appli(db, csv_reader)
 
-    return {"detail": "updated successfully", "updated_data": updated_users}
+    return {"detail": "updated successfully", "updated_data": updated_applis}
 
+
+#------------------------------------------------------------------------------------------------
+
+
+@app.post('/login', response_model=schemas.UserToken)
+def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
+    login_user = crud.login_user(db, email=user.email, password=user.password)
+    return login_user
+
+
+@app.get("/users", response_model=List[schemas.User])
+async def get_users(db: Session = Depends(get_db)):
+    users = crud.get_users(db)
+    return users
+
+@app.post('/users', response_model=schemas.User)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered.")
+    return crud.create_user(db=db, user=user)
 
 

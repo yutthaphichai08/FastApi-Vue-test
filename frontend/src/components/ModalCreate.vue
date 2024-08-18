@@ -16,7 +16,7 @@ export default {
   methods: {
     async handleSubmit() {
       try {
-        const apiUrl = "http://127.0.0.1:8000/users";
+        const apiUrl = "http://127.0.0.1:8000/application";
 
         const response = await axios.post(apiUrl, this.formData);
 

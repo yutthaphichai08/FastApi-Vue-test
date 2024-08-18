@@ -19,7 +19,7 @@ export default {
   methods: {
     async fetchData() {
       try {
-        const response = await fetch("http://127.0.0.1:8000/users");
+        const response = await fetch("http://127.0.0.1:8000/application");
         const data = await response.json();
         this.tableData = data;
       } catch (error) {
@@ -29,7 +29,7 @@ export default {
     async fetchUserData(userId) {
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/user/${userId}`
+          `http://127.0.0.1:8000/application/${userId}`
         );
         this.user = response.data;
       } catch (error) {
@@ -48,8 +48,8 @@ export default {
     },
     async deleteUser(userId) {
       try {
-        const response = await axios.patch(
-          `http://127.0.0.1:8000/user/delete/${userId}`
+        const response = await axios.delete(
+          `http://127.0.0.1:8000/application/${userId}`
         );
         this.user = response.data;
         console.log("User deleted successfully");
@@ -64,7 +64,7 @@ export default {
       }
       try {
         await axios.put(
-          `http://127.0.0.1:8000/user/update/${userId}`,
+          `http://127.0.0.1:8000/application/update/${userId}`,
           this.user
         );
         console.log("User updated successfully");

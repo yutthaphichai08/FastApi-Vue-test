@@ -5,7 +5,7 @@ import helper
 
 class AuthenMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        if request.url.path.startswith("/users"):
+        if request.url.path.startswith("/application") or request.url.path.startswith("/users") or request.url.path.startswith("/import") or request.url.path.startswith("/export"):
             try:
                 helper.verify_access_token(request)
             except HTTPException as exc:

@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 
 # สร้าง Schema สำหรับสร้าง User
-class UserCreate(BaseModel):
+class ApplicationCreate(BaseModel):
     firstname: str
     lastname: str
     address: str
@@ -11,7 +11,7 @@ class UserCreate(BaseModel):
     is_active: bool = True  
 
 # Schema สำหรับการอัปเดตผู้ใช้
-class UserUpdate(BaseModel):
+class ApplicationUpdate(BaseModel):
     firstname: Optional[str] = None
     lastname: Optional[str] = None
     address: Optional[str] = None
@@ -19,7 +19,7 @@ class UserUpdate(BaseModel):
     is_active: Optional[bool] = None
 
 # สร้าง Schema สำหรับการแสดงผล User
-class User(BaseModel):
+class Application(BaseModel):
     id: int
     firstname: str
     lastname: str
@@ -31,12 +31,28 @@ class User(BaseModel):
         from_attributes = True
 
 # สร้าง Schema สำหรับการลบ User
-class DeleteUser(BaseModel):
+class DeleteApplication(BaseModel):
     is_active: bool = False  
 
+# ---------Login----------
+class UserBase(BaseModel):
+    email: str
 
-# class UserBase(BaseModel):
-#     email: str
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: int
+
+class UserLogin(UserBase):
+    password: str
+
+class UserToken(User):
+    jwt: str
+    
+    
+    # class Config:
+    #     from_attributes = True
 
 
 # class UserCreate(UserBase):

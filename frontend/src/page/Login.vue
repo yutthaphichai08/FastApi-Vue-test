@@ -1,47 +1,29 @@
 <template>
   <div class="container">
     <div class="form-container">
-      <h1>กรอกข้อมูลผู้สมัคร</h1>
+      <h1>กรอกข้อมูล</h1>
       <form @submit.prevent="handleSubmit" class="form-content">
         <div class="form-group">
-          <label for="firstName">ชื่อ:</label>
+          <label for="email">Email:</label>
           <input
             type="text"
-            v-model="formData.firstname"
-            id="firstName"
+            v-model="formData.email"
+            id="email"
             required
             class="form-input"
           />
         </div>
         <div class="form-group">
-          <label for="lastName">นามสกุล:</label>
+          <label for="password">Password:</label>
           <input
             type="text"
-            v-model="formData.lastname"
+            v-model="formData.password"
             id="lastName"
             required
             class="form-input"
           />
         </div>
-        <div class="form-group">
-          <label for="address">ที่อยู่:</label>
 
-          <textarea
-            class="form-input"
-            v-model="formData.address"
-            id="address"
-          ></textarea>
-        </div>
-        <div class="form-group">
-          <label for="salary">เงินเดือนที่คาดหวัง:</label>
-          <input
-            type="number"
-            v-model="formData.salary"
-            id="salary"
-            required
-            class="form-input"
-          />
-        </div>
         <button type="submit" class="form-button">ส่งข้อมูล</button>
       </form>
     </div>
@@ -55,31 +37,26 @@ export default {
   data() {
     return {
       formData: {
-        firstname: "",
-        lastname: "",
-        address: "",
-        salary: 0,
+        email: "",
+        password: "",
       },
     };
   },
   methods: {
     async handleSubmit() {
       try {
-        const apiUrl = "http://127.0.0.1:8000/application";
-
+        const apiUrl = "http://127.0.0.1:8000/login";
         const response = await axios.post(apiUrl, this.formData);
-
         console.log("Response:", response.data);
-        alert("บันทึกข้อมูลสำเร็จ");
+        alert("เข้าสู่ระบบสำเร็จ");
+        window.location.href = "/application";
         this.formData = {
-          firstname: "",
-          lastname: "",
-          address: "",
-          salary: 0,
+          email: "",
+          password: "",
         };
       } catch (error) {
-        console.error("Error submitting form:", error);
-        alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
+        console.error("Error :", error);
+        alert("เกิดข้อผิดพลาด");
       }
     },
   },
