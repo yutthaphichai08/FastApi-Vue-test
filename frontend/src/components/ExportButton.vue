@@ -13,7 +13,7 @@ export default {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "export.csv");
+        link.setAttribute("download", "users.csv");
         document.body.appendChild(link);
         link.click();
         link.parentNode.removeChild(link);
