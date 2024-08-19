@@ -1,4 +1,4 @@
-##  pass for db
+##  User for DB
 ```sh 
 aaa@aaa.com
 111
