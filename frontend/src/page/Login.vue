@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="form-container">
-      <h1>กรอกข้อมูล</h1>
+      <h1>เข้าสู่ระบบ</h1>
       <form @submit.prevent="handleSubmit" class="form-content">
         <div class="form-group">
           <label for="email">Email:</label>
@@ -16,7 +16,7 @@
         <div class="form-group">
           <label for="password">Password:</label>
           <input
-            type="text"
+            type="password"
             v-model="formData.password"
             id="lastName"
             required
@@ -45,18 +45,33 @@ export default {
   methods: {
     async handleSubmit() {
       try {
-        const apiUrl = "http://127.0.0.1:8000/login";
-        const response = await axios.post(apiUrl, this.formData);
-        console.log("Response:", response.data);
+        const apiUrl = "http://localhost:8000/login";
+        axios
+          .post(apiUrl, this.formData)
+          .then(async (response) => {
+            console.log("res", response);
+            const data = response.data;
+            console.log("jwt", data.jwt);
+            if (data.jwt) {
+              localStorage.setItem("session", data.jwt);
+              window.location.href = "/application";
+            } else {
+              console.log("เกิดข้อผิดพลาดกรุณาลองใหม่", jwt);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
         alert("เข้าสู่ระบบสำเร็จ");
-        window.location.href = "/application";
+
         this.formData = {
           email: "",
           password: "",
         };
       } catch (error) {
         console.error("Error :", error);
-        alert("เกิดข้อผิดพลาด");
+        alert("เกิดข้อผิดพลาด222");
       }
     },
   },

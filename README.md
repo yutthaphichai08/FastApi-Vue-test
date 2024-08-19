@@ -1,3 +1,21 @@
-uvicorn main:app --reload       #run backend
-npm install                     #install package
-/application                    #ข้อมูลผู้สมัคร
+# Frontend
+
+##  Build Setup
+```sh 
+$npm install 
+```
+##  Server wit hot reload at localhost 3000
+```sh 
+$npm run dev
+```
+
+# Backend
+
+##  Build Setup
+```sh 
+pip install -r requirements.txt
+```
+##  Server wit hot reload at localhost 8000
+```sh 
+uvicorn main:app --reload
+```

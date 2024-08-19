@@ -3,6 +3,8 @@ import Home from "../page/Home.vue";
 import ListUsers from "../page/ListUsers.vue";
 import Login from "../page/Login.vue";
 
+import auth from "../middleware/auth";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -20,8 +22,10 @@ const router = createRouter({
       path: "/application",
       name: "ListUsers",
       component: ListUsers,
+      beforeEnter: auth,
     },
   ],
+  mode: "history",
 });
 
 export default router;

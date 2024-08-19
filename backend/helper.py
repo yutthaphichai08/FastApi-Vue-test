@@ -21,9 +21,8 @@ def verify_password(plain_password: str, hashed_password: str):
 def get_password_hash(password: str):
     return pwd_context.hash(password)
 
-def verify_access_token(request):
+def verify_access_token(token):
     try:
-        token = request.headers.get("Authorization")
         if not token:
             raise HTTPException(status_code=401, detail="Invalid token")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

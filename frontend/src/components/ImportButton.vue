@@ -26,7 +26,7 @@ export default {
       formData.append("file", file);
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/import", {
+        const response = await fetch("http://localhost:8000/admin/import", {
           method: "POST",
           body: formData,
         });

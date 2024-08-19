@@ -1,5 +1,7 @@
 <template>
+
   <div class="container">
+  
     <div class="form-container">
       <h1>กรอกข้อมูลผู้สมัคร</h1>
       <form @submit.prevent="handleSubmit" class="form-content">
@@ -46,6 +48,7 @@
       </form>
     </div>
   </div>
+  <button class="btn btn-primary floating-button" @click="handleButtonClick">Login</button>
 </template>
 
 <script>
@@ -65,7 +68,7 @@ export default {
   methods: {
     async handleSubmit() {
       try {
-        const apiUrl = "http://127.0.0.1:8000/application";
+        const apiUrl = "http://localhost:8000/application";
 
         const response = await axios.post(apiUrl, this.formData);
 
@@ -81,6 +84,9 @@ export default {
         console.error("Error submitting form:", error);
         alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
       }
+    },
+    handleButtonClick() {
+      window.location.href = '/login'
     },
   },
 };
@@ -162,5 +168,11 @@ h1 {
 
 .form-button:hover {
   background-color: #0056b3;
+}
+.floating-button {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1050; /* Ensure button is above other content */
 }
 </style>

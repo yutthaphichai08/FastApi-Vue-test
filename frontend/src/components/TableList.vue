@@ -18,21 +18,44 @@ export default {
   },
   methods: {
     async fetchData() {
-      try {
-        const response = await fetch("http://127.0.0.1:8000/application");
-        const data = await response.json();
-        this.tableData = data;
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+      const jwt = await localStorage.getItem("session");
+      console.log('jwt--',jwt);
+
+      const getData = async () => {
+        try {
+          const headers = new Headers();
+          await headers.append(`authorization`,"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjQwODgyMTAsInN1YiI6MX0.UKYPZg6kNGg_kF9SezexPJ3k0aA-chWVwCtkNF29cdM")
+          const response = await fetch(
+            "http://localhost:8000/admin/application",
+            {
+              method: "GET",
+              headers
+            }
+          );
+          const data = await response.json();
+          this.tableData = data
+          console.log(data);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      getData();
     },
     async fetchUserData(userId) {
       try {
+        const jwt = await localStorage.getItem("session");
+        // console.log(jwt);
         const response = await axios.get(
-          `http://127.0.0.1:8000/application/${userId}`
+          `http://localhost:8000/admin/application/${userId}`,
+          {
+            headers: {
+              Authorization: jwt,
+            },
+          }
         );
         this.user = response.data;
       } catch (error) {
+        window.location.href = "/login";
         console.error("Error fetching user data:", error);
       }
     },
@@ -48,8 +71,14 @@ export default {
     },
     async deleteUser(userId) {
       try {
+        const jwt = await localStorage.getItem("session");
         const response = await axios.delete(
-          `http://127.0.0.1:8000/application/${userId}`
+          `http://localhost:8000/admin/application/${userId}`,
+          {
+            headers: {
+              Authorization: jwt,
+            },
+          }
         );
         this.user = response.data;
         console.log("User deleted successfully");
@@ -63,9 +92,15 @@ export default {
         return;
       }
       try {
+        const jwt = await localStorage.getItem("session");
         await axios.put(
-          `http://127.0.0.1:8000/application/update/${userId}`,
-          this.user
+          `http://localhost:8000/admin/application/update/${userId}`,
+          this.user,
+          {
+            headers: {
+              Authorization: jwt,
+            },
+          }
         );
         console.log("User updated successfully");
         location.reload();

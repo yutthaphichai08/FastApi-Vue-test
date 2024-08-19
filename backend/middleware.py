@@ -5,9 +5,12 @@ import helper
 
 class AuthenMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        if request.url.path.startswith("/application") or request.url.path.startswith("/users") or request.url.path.startswith("/import") or request.url.path.startswith("/export"):
+        
+        if request.url.path.startswith("/adminss") :
             try:
-                helper.verify_access_token(request)
+                jwt = request.headers['authorization']
+                print(jwt)
+                helper.verify_access_token()
             except HTTPException as exc:
                 return JSONResponse(content={"detail": exc.detail}, status_code=exc.status_code)
             except Exception as exc:

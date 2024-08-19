@@ -16,11 +16,15 @@ export default {
   methods: {
     async handleSubmit() {
       try {
-        const apiUrl = "http://127.0.0.1:8000/application";
+        const jwt = await localStorage.getItem("session");
+        const apiUrl = "http://localhost:8000/application";
 
-        const response = await axios.post(apiUrl, this.formData);
-
-        console.log("Response:", response.data);
+        await axios.post(apiUrl, this.formData, {
+          headers: {
+            Authorization: jwt,
+          },
+        });
+        // console.log("Response:", response.data);
         location.reload();
         alert("บันทึกข้อมูลสำเร็จ");
         this.formData = {

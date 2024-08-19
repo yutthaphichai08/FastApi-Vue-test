@@ -5,8 +5,8 @@ from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
-import crud, models, schemas
-from database import conn, engine
+import crud, models, schemas,middleware
+from db import conn, engine
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -25,16 +25,20 @@ def get_db():
 
 origins = [
     "http://localhost:3000",
+    'http://127.0.0.1:3000'
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins="*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.add_middleware(
+     middleware.AuthenMiddleware
+)
 
 @app.post("/application", response_model=schemas.Application)
 def create_user(appli: schemas.ApplicationCreate, db: Session = Depends(get_db)):
@@ -45,13 +49,13 @@ def create_user(appli: schemas.ApplicationCreate, db: Session = Depends(get_db))
     return crud.create_appli(db=db, appli=appli)
 
 
-@app.get("/application", response_model=list[schemas.Application])
+@app.get("/admin/application", response_model=list[schemas.Application])
 def read_applis(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     applis = crud.get_applis(db, skip=skip, limit=limit)
     return applis
 
 
-@app.get("/application/{appli_id}", response_model=schemas.Application)
+@app.get("/admin/application/{appli_id}", response_model=schemas.Application)
 def get_appli(appli_id: int, db: Session = Depends(get_db)):
     db_appli= crud.get_appli(db=db, appli_id=appli_id)
     if not db_appli:
@@ -59,7 +63,7 @@ def get_appli(appli_id: int, db: Session = Depends(get_db)):
     return db_appli
 
 
-@app.put("/application/update/{appli_id}", response_model=schemas.Application)
+@app.put("/admin/application/update/{appli_id}", response_model=schemas.Application)
 def appli_update(appli_id: int, appli_update: schemas.ApplicationUpdate, db: Session = Depends(get_db)):
     if not appli_update.firstname or not appli_update.lastname:
         raise HTTPException(status_code=400, detail="Firstname and Lastname are required")
@@ -70,7 +74,7 @@ def appli_update(appli_id: int, appli_update: schemas.ApplicationUpdate, db: Ses
     return db_appli
 
 
-@app.delete("/application/{appli_id}", response_model=schemas.Application)
+@app.delete("/admin/application/{appli_id}", response_model=schemas.Application)
 def de_activate_user(appli_id: int, db: Session = Depends(get_db)):
     db_appli = crud.delete_appli(db=db, appli_id=appli_id)
     if not db_appli:
@@ -78,7 +82,7 @@ def de_activate_user(appli_id: int, db: Session = Depends(get_db)):
     return db_appli
 
     
-@app.get("/export")
+@app.get("/admin/export")
 async def export_users(db: Session = Depends(get_db)):
     applis = crud.get_applis(db)
     buffer = io.StringIO()
@@ -95,7 +99,7 @@ async def export_users(db: Session = Depends(get_db)):
     })
     
 
-@app.post("/import")
+@app.post("/admin/import")
 async def update_applis_from_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
 
     if file.content_type != 'text/csv':
@@ -121,7 +125,7 @@ def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     return login_user
 
 
-@app.get("/users", response_model=List[schemas.User])
+@app.get("/admin/users", response_model=List[schemas.User])
 async def get_users(db: Session = Depends(get_db)):
     users = crud.get_users(db)
     return users
