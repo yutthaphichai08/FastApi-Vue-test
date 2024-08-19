@@ -173,6 +173,6 @@ h1 {
   position: fixed;
   top: 1rem;
   right: 1rem;
-  z-index: 1050; /* Ensure button is above other content */
+  z-index: 1050; 
 }
 </style>

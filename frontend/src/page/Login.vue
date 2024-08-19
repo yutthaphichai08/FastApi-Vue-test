@@ -28,6 +28,9 @@
       </form>
     </div>
   </div>
+  <button class="btn btn-primary floating-button" @click="handleButtonClick">
+    Back
+  </button>
 </template>
 
 <script>
@@ -49,21 +52,32 @@ export default {
         axios
           .post(apiUrl, this.formData)
           .then(async (response) => {
-            console.log("res", response);
+            // console.log("res", response);
             const data = response.data;
-            console.log("jwt", data.jwt);
+            // console.log("jwt", data.jwt);
             if (data.jwt) {
               localStorage.setItem("session", data.jwt);
               window.location.href = "/application";
+              alert("เข้าสู่ระบบสำเร็จ");
             } else {
-              console.log("เกิดข้อผิดพลาดกรุณาลองใหม่", jwt);
+              console.log("เกิดข้อผิดพลาดกรุณาลองใหม่");
             }
           })
           .catch((err) => {
-            console.log(err);
+            if (err.response) {
+              const statusCode = err.response.status;
+              if (statusCode === 401) {
+                alert("รหัสผ่านหรือชื่อผู้ใช้ไม่ถูกต้อง");
+              } else {
+                alert("เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
+              }
+            } else if (err.request) {
+              alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
+            } else {
+              alert("เกิดข้อผิดพลาดในการส่งคำขอ");
+            }
+            // console.error("Error details:", err);
           });
-
-        alert("เข้าสู่ระบบสำเร็จ");
 
         this.formData = {
           email: "",
@@ -71,8 +85,11 @@ export default {
         };
       } catch (error) {
         console.error("Error :", error);
-        alert("เกิดข้อผิดพลาด222");
+        alert("เกิดข้อผิดพลาด");
       }
+    },
+    handleButtonClick() {
+      window.location.href = "/";
     },
   },
 };
@@ -154,5 +171,11 @@ h1 {
 
 .form-button:hover {
   background-color: #0056b3;
+}
+.floating-button {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1050;
 }
 </style>

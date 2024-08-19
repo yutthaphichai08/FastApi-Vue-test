@@ -19,7 +19,7 @@ export default {
   methods: {
     async fetchData() {
       const jwt = await localStorage.getItem("session");
-      console.log('jwt--',jwt);
+      // console.log('jwt--',jwt);
 
       const getData = async () => {
         try {
@@ -34,7 +34,7 @@ export default {
           );
           const data = await response.json();
           this.tableData = data
-          console.log(data);
+          // console.log(data);
         } catch (error) {
           console.log(error);
         }
