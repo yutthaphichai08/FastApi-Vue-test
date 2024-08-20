@@ -42,7 +42,6 @@ export default {
       modal.show();
     },
     clearLocalStorage() {
-      localStorage.clear();
       const userConfirmed = window.confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
       if (userConfirmed) {
         try {
